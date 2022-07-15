@@ -1,4 +1,4 @@
-#include "../../src/engine/engine.hpp"
+#include "../../../src/engine/engine.hpp"
 
 #include <iostream>
 
@@ -6,7 +6,7 @@ void init() {
     std::cout << "hi, mom" << std::endl;
 }
 
-void update( double dt ) {
+void update( time_t dt ) {
     std::cout << "update, dt: " << dt << std::endl;
 }
 

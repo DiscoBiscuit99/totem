@@ -1,3 +1,5 @@
+#include "../utils/utils.hpp"
+
 #include <iostream>
 #include <unistd.h>
 
@@ -5,7 +7,7 @@ namespace Engine {
 
     /**
      * @brief This struct stores the pointers to the functions. MIght not be needed later...
-     * 
+     *
      */
     struct State {
         void (*init_fn)() = nullptr;
@@ -17,14 +19,14 @@ namespace Engine {
 
     /**
      * @brief This function is called to initialize the state of the engine.
-     * 
+     *
      */
     void init();
 
     /**
      * @brief This function hooks the given function to the state of the engine.
      * This function is called once on engine_startup
-     * 
+     *
      * @param fn The function pointer
      */
     void hook_init( void (*fn)() );
@@ -47,7 +49,7 @@ namespace Engine {
 
     /**
      * @brief This function starts the engine.
-     * 
+     *
      */
     void run();
 

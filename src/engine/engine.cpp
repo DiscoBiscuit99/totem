@@ -1,6 +1,6 @@
 #include "engine.hpp"
-#include <unistd.h> // fork
 
+#include <unistd.h> // fork
 #include <sys/time.h>
 #include <ctime>
 #include <chrono>
@@ -24,31 +24,26 @@ void Engine::hook_render( void (*fn)() ) {
 
 void Engine::run() {
 
-    
     state.init_fn();
 
-
     if ( fork() ) { // Might need to check for error -1
-        while ( true ) {
-            // BEGIN RENDER LOOP IN SEPARATE THREAD
+
+        while ( true )
             state.render_fn();
-            // END RENDER LOOP
-        }
+
     } else {
+
         time_t dt = 0.0;
         time_t start;
+
         while ( true ) {
-            start = time(nullptr) * 1000;
-            
-            // BEGIN UPDATE LOOP IN SEPARATE THREAD
+            start = get_time_millis();
+
             state.update_fn( dt );
 
-            // END UPDATE LOOP
-            dt = (time(nullptr) * 1000) - start;
-            
-            
+            dt = get_time_millis() - start;
        }
+
     }
 
-    
 }
