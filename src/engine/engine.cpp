@@ -2,9 +2,10 @@
 #include "engine.hpp"
 
 #include <unistd.h> // fork
-#include <sys/time.h>
 #include <ctime>
 #include <chrono>
+#include <iostream>
+#include <unistd.h>
 
 void Engine::init() {
     state = State{};

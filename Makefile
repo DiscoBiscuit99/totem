@@ -13,17 +13,17 @@ ENGINE_SRC = ${SRC_FILES}/engine
 TEST_SRC = tests
 ENGINE_TESTS = ${TEST_SRC}/engine
 
-ALL_FILES = ${UTILS_SRC}/*.cpp ${ENGINE_SRC}/*.cpp ${ENGINE_TESTS}/simple_test/*.cpp ${LIB_FILES}/glad.c
+ALL_FILES_ENGINE = ${UTILS_SRC}/*.cpp ${ENGINE_SRC}/*.cpp ${LIB_FILES}/glad.c
 
-engine: ${ENGINE_SRC}/* ${LIB_FILES}/glad.c
+engine: ${ALL_FILES_ENGINE}
 	g++ $(CFLAGS) -o totem $^ $(LDFLAGS)
 
 # Tests
 
-simple_test: ${ALL_FILES}
+simple_test: ${ALL_FILES_ENGINE} ${ENGINE_TESTS}/simple_test/*.cpp
 	g++ $(CFLAGS) -o totem_test $^ $(LDFLAGS)
 
-deltatime_test: ${ALL_FILES}
+deltatime_test: ${ALL_FILES_ENGINE} ${ENGINE_TESTS}/deltatime_test/*.cpp
 	g++ $(CFLAGS) -o totem_test $^ $(LDFLAGS)
 
 .PHONY: run test clean
