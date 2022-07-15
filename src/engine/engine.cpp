@@ -1,3 +1,4 @@
+#include "../utils/utils.hpp"
 #include "engine.hpp"
 
 #include <unistd.h> // fork
