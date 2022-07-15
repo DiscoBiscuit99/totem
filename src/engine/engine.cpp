@@ -1,4 +1,5 @@
 #include "engine.hpp"
+#include <unistd.h>
 
 void Engine::init() {
     state = State{};
@@ -23,11 +24,21 @@ void Engine::run() {
 
     state.init_fn();
 
-    // BEGIN UPDATE LOOP IN SEPARATE THREAD
-    state.update_fn( dt );
-    // END UPDATE LOOP
+    pid_t spawn = fork();
 
-    // BEGIN RENDER LOOP IN SEPARATE THREAD
-    state.render_fn();
-    // END RENDER LOOP
+    if ( spawn == 0 ) {
+        while ( true ) {
+            // BEGIN RENDER LOOP IN SEPARATE THREAD
+            state.render_fn();
+            // END RENDER LOOP
+        }
+    } else {
+        while ( true ) {
+            // BEGIN UPDATE LOOP IN SEPARATE THREAD
+            state.update_fn( dt );
+            // END UPDATE LOOP
+       }
+    }
+
+    
 }
