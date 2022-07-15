@@ -11,7 +11,7 @@ TEST_SRC = tests
 engine: ${ENGINE_SRC}/* ${LIB_FILES}/glad.c
 	g++ $(CFLAGS) -o totem $^ $(LDFLAGS)
 
-build_test: ${TEST_SRC}/simple_test/* ${LIB_FILES}/glad.c
+build_test: ${ENGINE_SRC}/* ${TEST_SRC}/simple_test/* ${LIB_FILES}/glad.c
 	g++ $(CFLAGS) -o totem_test $^ $(LDFLAGS)
 
 .PHONY: run test clean
