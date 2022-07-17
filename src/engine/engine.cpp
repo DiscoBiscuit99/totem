@@ -4,9 +4,15 @@
 #include <iostream>
 
 #include "engine.hpp"
+#include "graphics.hpp"
 
 namespace engine {
 
+/**
+ * @brief Calculates the current time in milliseconds.
+ *
+ * @return The current time in milliseconds.
+ */
 inline time_t get_time_millis() { return time(nullptr) * 1000; }
 
 void process_input(GLFWwindow *window) {
@@ -14,28 +20,22 @@ void process_input(GLFWwindow *window) {
   int caps_state = glfwGetKey(window, GLFW_KEY_CAPS_LOCK);
   int space_state = glfwGetKey(window, GLFW_KEY_SPACE);
 
+  // Quick debug exiting of the program.
   if (escape_state == GLFW_PRESS || caps_state == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
 
   // Clear color test.
-  if (space_state == GLFW_PRESS) {
-    state.window.clear_color[0] = 0.0f;
-    state.window.clear_color[1] = 1.0f;
-    state.window.clear_color[2] = 1.0f;
-    state.window.clear_color[3] = 1.0f;
-  }
+  if (space_state == GLFW_PRESS)
+    graphics::set_clear_color(graphics::current_window(),
+                              graphics::color::CYAN);
 }
 
 void hook_update(void (*fn)(long _)) { state.user_update = fn; }
+
 void hook_render(void (*fn)()) { state.user_render = fn; }
 
 int init() {
-  glfwInit();
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-  glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-  glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-  state.window = create_window("test window", 800, 600);
+  graphics::init();
 
   // Set OpenGL function pointers.
   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -52,7 +52,7 @@ int run() {
   time_t start;
   time_t dt = get_time_millis();
 
-  while (!state.window.should_close) {
+  while (!graphics::current_window()->should_close) {
     start = get_time_millis();
 
     update((long)dt);
@@ -69,25 +69,31 @@ int run() {
 void update(long dt) {
   glfwPollEvents();
 
-  process_input(state.window.glfw_window);
+  process_input(graphics::current_window()->glfw_window);
 
   state.user_update(dt);
 
-  state.window.should_close = glfwWindowShouldClose(state.window.glfw_window);
+  graphics::current_window()->should_close =
+      glfwWindowShouldClose(graphics::current_window()->glfw_window);
 }
 
 void render() {
-  glClearColor(state.window.clear_color[0], state.window.clear_color[1],
-               state.window.clear_color[2], state.window.clear_color[3]);
+  graphics::Window *current_window = graphics::current_window();
+  float r = current_window->clear_color.red;
+  float g = current_window->clear_color.green;
+  float b = current_window->clear_color.blue;
+  float a = current_window->clear_color.alpha;
+
+  glClearColor(r, g, b, a);
   glClear(GL_COLOR_BUFFER_BIT);
 
   state.user_render();
 
-  glfwSwapBuffers(state.window.glfw_window);
+  glfwSwapBuffers(current_window->glfw_window);
 }
 
 void cleanup() {
-  glfwDestroyWindow(state.window.glfw_window);
+  glfwDestroyWindow(graphics::current_window()->glfw_window);
   glfwTerminate();
 }
 
