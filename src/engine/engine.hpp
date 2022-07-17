@@ -1,54 +1,50 @@
-#include <sys/time.h>
+#ifndef ENGINE_H_
+#define ENGINE_H_
 
-namespace Engine {
+#include <GLFW/glfw3.h>
 
-    /**
-     * @brief This struct stores the pointers to the functions. MIght not be needed later...
-     *
-     */
-    struct State {
-        void (*init_fn)() = nullptr;
-        void (*update_fn)( time_t dt ) = nullptr;
-        void (*render_fn)() = nullptr;
-    } typedef State;
+#include "window.hpp"
 
-    static State state;
+namespace engine {
 
-    /**
-     * @brief This function is called to initialize the state of the engine.
-     *
-     */
-    void init();
+struct State {
+  Window window;
 
-    /**
-     * @brief This function hooks the given function to the state of the engine.
-     * This function is called once on engine_startup
-     *
-     * @param fn The function pointer
-     */
-    void hook_init( void (*fn)() );
+  void (*user_update)(long dt);
+  void (*user_render)();
+} typedef State;
 
-    /**
-     * @brief This function hooks the given function to the state of the engine.
-     * The delta-time is in milliseconds.
-     * The given function will be called as fast as the CPU allows.
-     * @param fn The function pointer
-     */
-    void hook_update( void (*fn)( time_t dt ) );
+static State state;
 
-    /**
-     * @brief This function hooks the given function to the state of the engine.
-     * The given function will be called as fast as the CPU allows.
-     * Spawned on a different thread, so the execution-time of the updatefunction doesn't affect when this function is called.
-     * @param fn The function pointer
-     */
-    void hook_render( void (*fn)() );
+void process_input(GLFWwindow *window);
 
-    /**
-     * @brief This function starts the engine.
-     *
-     */
-    void run();
+/**
+ * @brief Hooks the given function to the `update` function of the engine.
+ */
+void hook_update(void (*fn)(long dt));
 
-}
+/**
+ * @brief Hooks the given function to the `render` function of the engine.
+ */
+void hook_render(void (*fn)());
 
+/**
+ * @brief Initializes the engine state.
+ */
+int init();
+
+/**
+ * @brief Runs the engine.
+ * @pre Engine `update` and `render` functions must be hooked up.
+ * @return An error code (0 for success).
+ */
+int run();
+
+void update(long dt);
+void render();
+
+void cleanup();
+
+} // namespace engine
+
+#endif // ENGINE_H_

@@ -31,7 +31,7 @@ deltatime_test: ${ALL_FILES_ENGINE} ${ENGINE_TESTS}/deltatime_test/*.cpp
 run: engine
 	./totem
 
-test: deltatime_test
+test: simple_test
 	./totem_test
 
 clean:

@@ -2,26 +2,15 @@
 
 #include <iostream>
 
-void init() {
-    std::cout << "hi, mom" << std::endl;
-}
+void init() { std::cout << "hi, mom" << std::endl; }
 
-void update( time_t dt ) {
-    std::cout << "update, dt: " << dt << std::endl;
-}
+void update(long dt) { std::cout << "update, dt: " << dt << std::endl; }
 
-void render() {
-    std::cout << "render" << std::endl;
-}
+void render() { std::cout << "render" << std::endl; }
 
 int main() {
-    Engine::init();
+  engine::hook_update(&update);
+  engine::hook_render(&render);
 
-    Engine::hook_init( &init );
-    Engine::hook_update( &update );
-    Engine::hook_render( &render );
-
-    Engine::run();
-
-    return 0;
+  return engine::run();
 }
