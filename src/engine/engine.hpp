@@ -36,7 +36,7 @@ void hook_render(void (*fn)());
 /**
  * @brief Initializes the engine state.
  */
-int init();
+void init();
 
 /**
  * @brief Runs the engine.

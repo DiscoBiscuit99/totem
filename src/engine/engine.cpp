@@ -39,10 +39,9 @@ void hook_update(void (*fn)(long _)) { state.user_update = fn; }
 
 void hook_render(void (*fn)()) { state.user_render = fn; }
 
-int init() {
+void init() {
     graphics::init();
-
-    return 0;
+    state.is_running = true;
 }
 
 int run() {
@@ -51,16 +50,25 @@ int run() {
     time_t start;
     time_t dt = get_time_millis();
 
+    while (state.is_running) {
+        start = get_time_millis();
+
+        update((long)dt);
+        render();
+
+        dt = get_time_millis() - start;
+    }
+
     // while (!graphics::current_window()->should_close) {
     //   start = get_time_millis();
 
     //  update((long)dt);
     //  render();
 
-    //  dt = get_time_millis();
+    //  dt = get_time_millis() - start;
     //}
 
-    // cleanup();
+    cleanup();
 
     return 0;
 }
@@ -68,32 +76,32 @@ int run() {
 void update(long dt) {
     glfwPollEvents();
 
-    process_input(graphics::current_window()->glfw_window);
+    // process_input(graphics::current_window()->glfw_window);
 
     state.user_update(dt);
 
-    graphics::current_window()->should_close =
-        glfwWindowShouldClose(graphics::current_window()->glfw_window);
+    // graphics::current_window()->should_close =
+    //     glfwWindowShouldClose(graphics::current_window()->glfw_window);
 }
 
 void render() {
-    graphics::Window *current_window = graphics::current_window();
+    // graphics::Window *current_window = graphics::current_window();
 
-    float r = current_window->clear_color.red;
-    float g = current_window->clear_color.green;
-    float b = current_window->clear_color.blue;
-    float a = current_window->clear_color.alpha;
+    // float r = current_window->clear_color.red;
+    // float g = current_window->clear_color.green;
+    // float b = current_window->clear_color.blue;
+    // float a = current_window->clear_color.alpha;
 
-    glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    // glClearColor(r, g, b, a);
+    // glClear(GL_COLOR_BUFFER_BIT);
 
     state.user_render();
 
-    glfwSwapBuffers(current_window->glfw_window);
+    // glfwSwapBuffers(current_window->glfw_window);
 }
 
 void cleanup() {
-    glfwDestroyWindow(graphics::current_window()->glfw_window);
+    // glfwDestroyWindow(graphics::current_window()->glfw_window);
     glfwTerminate();
 }
 
