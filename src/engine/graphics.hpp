@@ -18,22 +18,22 @@ void init();
  * @brief A struct containing relevant information regarding windows.
  */
 struct Window {
-  // The actual (glfw) window
-  GLFWwindow *glfw_window;
+    // The actual (glfw) window
+    GLFWwindow *glfw_window;
 
-  // Meta data pertaining to the window
-  const char *title;
-  int width, height;
-  bool should_close;
+    // Meta data pertaining to the window
+    const char *title;
+    int width, height;
+    bool should_close;
 
-  // Default clear color
-  Color clear_color = Color{
-      // A nice pinkish color
-      .red = 0.75f,
-      .green = 0.0f,
-      .blue = 0.25f,
-      .alpha = 1.0f,
-  };
+    // Default clear color
+    Color clear_color = Color{
+        // A nice pinkish color
+        .red = 0.75f,
+        .green = 0.0f,
+        .blue = 0.25f,
+        .alpha = 1.0f,
+    };
 } typedef Window;
 
 /**
@@ -45,7 +45,7 @@ static std::vector<Window> windows;
  * @brief A struct holding only the current window (for the moment).
  */
 struct GraphicsState {
-  Window *current_window;
+    Window *current_window;
 } typedef GraphicsState;
 
 static GraphicsState graphics_state;
@@ -69,7 +69,7 @@ void frame_buffer_size_callback(GLFWwindow *window, int width, int height);
  *
  * @return The newly created window's index or an error code.
  */
-int create_window(const char *title, int width, int height);
+Window *create_window(const char *title, int width, int height);
 
 /**
  * @brief Sets the window context to the given window.
@@ -92,6 +92,18 @@ void set_clear_color(Window *window, Color clear_color);
  * @return A pointer to the current window.
  */
 Window *current_window();
+
+/**
+ * @brief Destroys the window, freeing the GLFW context.
+ *
+ * @param window The window to destroy.
+ */
+void destroy_window(Window window);
+
+/**
+ * @brief Cleans up the graphics related resources.
+ */
+void cleanup();
 
 } // namespace graphics
 

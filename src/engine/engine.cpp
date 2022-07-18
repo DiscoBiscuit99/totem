@@ -16,18 +16,23 @@ namespace engine {
 inline time_t get_time_millis() { return time(nullptr) * 1000; }
 
 void process_input(GLFWwindow *window) {
-  int escape_state = glfwGetKey(window, GLFW_KEY_ESCAPE);
-  int caps_state = glfwGetKey(window, GLFW_KEY_CAPS_LOCK);
-  int space_state = glfwGetKey(window, GLFW_KEY_SPACE);
+    int escape_state = glfwGetKey(window, GLFW_KEY_ESCAPE);
+    int caps_state = glfwGetKey(window, GLFW_KEY_CAPS_LOCK);
+    int space_state = glfwGetKey(window, GLFW_KEY_SPACE);
+    int enter_state = glfwGetKey(window, GLFW_KEY_ENTER);
 
-  // Quick debug exiting of the program.
-  if (escape_state == GLFW_PRESS || caps_state == GLFW_PRESS)
-    glfwSetWindowShouldClose(window, true);
+    // Quick debug exiting of the program.
+    if (escape_state == GLFW_PRESS || caps_state == GLFW_PRESS)
+        glfwSetWindowShouldClose(window, true);
 
-  // Clear color test.
-  if (space_state == GLFW_PRESS)
-    graphics::set_clear_color(graphics::current_window(),
-                              graphics::color::CYAN);
+    // Clear color test.
+    if (space_state == GLFW_PRESS)
+        graphics::set_clear_color(graphics::current_window(),
+                                  graphics::color::CYAN);
+
+    // Multiple window test.
+    if (enter_state == GLFW_PRESS)
+        graphics::create_window("extra window", 400, 300);
 }
 
 void hook_update(void (*fn)(long _)) { state.user_update = fn; }
@@ -35,66 +40,61 @@ void hook_update(void (*fn)(long _)) { state.user_update = fn; }
 void hook_render(void (*fn)()) { state.user_render = fn; }
 
 int init() {
-  graphics::init();
+    graphics::init();
 
-  // Set OpenGL function pointers.
-  if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    std::cerr << "Failed to initialize GLAD." << std::endl;
-    return -1;
-  }
-
-  return 0;
+    return 0;
 }
 
 int run() {
-  init();
+    init();
 
-  time_t start;
-  time_t dt = get_time_millis();
+    time_t start;
+    time_t dt = get_time_millis();
 
-  while (!graphics::current_window()->should_close) {
-    start = get_time_millis();
+    // while (!graphics::current_window()->should_close) {
+    //   start = get_time_millis();
 
-    update((long)dt);
-    render();
+    //  update((long)dt);
+    //  render();
 
-    dt = get_time_millis();
-  }
+    //  dt = get_time_millis();
+    //}
 
-  cleanup();
+    // cleanup();
 
-  return 0;
+    return 0;
 }
 
 void update(long dt) {
-  glfwPollEvents();
+    glfwPollEvents();
 
-  process_input(graphics::current_window()->glfw_window);
+    process_input(graphics::current_window()->glfw_window);
 
-  state.user_update(dt);
+    state.user_update(dt);
 
-  graphics::current_window()->should_close =
-      glfwWindowShouldClose(graphics::current_window()->glfw_window);
+    graphics::current_window()->should_close =
+        glfwWindowShouldClose(graphics::current_window()->glfw_window);
 }
 
 void render() {
-  graphics::Window *current_window = graphics::current_window();
-  float r = current_window->clear_color.red;
-  float g = current_window->clear_color.green;
-  float b = current_window->clear_color.blue;
-  float a = current_window->clear_color.alpha;
+    graphics::Window *current_window = graphics::current_window();
 
-  glClearColor(r, g, b, a);
-  glClear(GL_COLOR_BUFFER_BIT);
+    float r = current_window->clear_color.red;
+    float g = current_window->clear_color.green;
+    float b = current_window->clear_color.blue;
+    float a = current_window->clear_color.alpha;
 
-  state.user_render();
+    glClearColor(r, g, b, a);
+    glClear(GL_COLOR_BUFFER_BIT);
 
-  glfwSwapBuffers(current_window->glfw_window);
+    state.user_render();
+
+    glfwSwapBuffers(current_window->glfw_window);
 }
 
 void cleanup() {
-  glfwDestroyWindow(graphics::current_window()->glfw_window);
-  glfwTerminate();
+    glfwDestroyWindow(graphics::current_window()->glfw_window);
+    glfwTerminate();
 }
 
 } // namespace engine

@@ -7,10 +7,10 @@ namespace graphics {
  * @brief A struct representing color.
  */
 struct Color {
-  float red;
-  float green;
-  float blue;
-  float alpha;
+    float red;
+    float green;
+    float blue;
+    float alpha;
 } typedef Color;
 
 namespace color {

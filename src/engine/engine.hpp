@@ -11,8 +11,10 @@ namespace engine {
  * @brief A struct representing the state of the engine.
  */
 struct State {
-  void (*user_update)(long dt);
-  void (*user_render)();
+    bool is_running;
+
+    void (*user_update)(long dt);
+    void (*user_render)();
 } typedef State;
 
 static State state;
