@@ -1,80 +1,91 @@
 #include "../../includes/glad/glad.h"
-
 #include <GLFW/glfw3.h>
+
+#include <exception>
 #include <iostream>
 
 #include "graphics.hpp"
 
+namespace totem {
+
 namespace graphics {
 
-void init() {
-    graphics_state = GraphicsState{};
-
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // create_window("test window", 800, 600);
-
-    // Set OpenGL function pointers.
-    // if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-    //  std::cerr << "Failed to initialize GLAD." << std::endl;
-    //}
-}
-
-void frame_buffer_size_callback(GLFWwindow *_, int width, int height) {
-    glViewport(0, 0, width, height);
-}
-
-Window *create_window(const char *title, int width, int height) {
-    GLFWwindow *glfw_window =
-        glfwCreateWindow(800, 600, "test window", nullptr, nullptr);
-
-    if (glfw_window == nullptr) {
-        std::cerr << "Failed to create a GLFW window." << std::endl;
-        glfwTerminate();
+    void frame_buffer_size_callback( GLFWwindow* _, int width, int height ) {
+        glViewport( 0, 0, width, height );
     }
 
-    windows.push_back(Window{
-        .glfw_window = glfw_window,
-        .title = title,
-        .width = width,
-        .height = height,
-        .should_close = false,
-    });
-
-    int new_wnd_idx = windows.size() - 1;
-    Window *new_window = &windows.data()[new_wnd_idx];
-
-    set_current_window(new_window);
-
-    return new_window;
-}
-
-void set_current_window(Window *window) {
-    glfwMakeContextCurrent(window->glfw_window);
-    glfwSetFramebufferSizeCallback(window->glfw_window,
-                                   frame_buffer_size_callback);
-
-    graphics_state.current_window = window;
-}
-
-void set_clear_color(Window *window, Color clear_color) {
-    window->clear_color = clear_color;
-}
-
-Window *current_window() { return graphics_state.current_window; }
-
-void destroy_window(Window window) { glfwDestroyWindow(window.glfw_window); }
-
-void cleanup() {
-    while (windows.size() > 0) {
-        destroy_window(*windows.end());
-        windows.pop_back();
+    void init() {
+        glfwInit();
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+        glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
     }
 
-    glfwTerminate();
-}
+    void cleanup() { glfwTerminate(); }
+
+    void update() {}
+
+    void render() {
+        if ( current_context() != nullptr ) {
+            set_clear_color( current_window()->clear_color );
+            clear_window();
+            glfwSwapBuffers( current_context() );
+        }
+    }
+
+    void new_window( const char* title, int width, int height ) {
+        GLFWwindow* glfw_window =
+            glfwCreateWindow( width, height, title, nullptr, nullptr );
+
+        if ( glfw_window != nullptr ) {
+
+            current_context( glfw_window );
+            glfwSetFramebufferSizeCallback( glfw_window,
+                                            frame_buffer_size_callback );
+
+            WINDOWS.push_back( Window{ .glfw_window = glfw_window } );
+
+            // Set OpenGL function pointers when the first window has spawned.
+            if ( WINDOWS.size() == 1 )
+                if ( !gladLoadGLLoader( (GLADloadproc)glfwGetProcAddress ) ) {
+                    std::cerr << "Failed to initialize GLAD." << std::endl;
+                }
+
+            std::cout << "Created new window. " << WINDOWS.size()
+                      << " windows now exist." << std::endl;
+
+        } else
+            std::cerr << "Failed to create a GLFW window." << std::endl;
+    }
+
+    void destroy_current_window() {
+        if ( WINDOWS.size() != 0 ) {
+            glfwDestroyWindow( current_context() );
+
+            WINDOWS.pop_back();
+            glfwMakeContextCurrent( WINDOWS.end()->glfw_window );
+        }
+    }
+
+    GLFWwindow* current_context() { return glfwGetCurrentContext(); }
+
+    void current_context( GLFWwindow* glfw_window ) {
+        glfwMakeContextCurrent( glfw_window );
+    }
+
+    void set_clear_color( Color clear_color ) {
+        current_window()->clear_color = clear_color;
+    }
+
+    void clear_window() {
+        Color color = current_window()->clear_color;
+
+        glClearColor( color.red, color.green, color.blue, color.alpha );
+        glClear( GL_COLOR_BUFFER_BIT );
+    }
+
+    Window* current_window() { return &WINDOWS.data()[CURRENT_WND_IDX]; }
 
 } // namespace graphics
+
+} // namespace totem

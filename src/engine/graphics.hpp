@@ -5,106 +5,168 @@
 
 #include <vector>
 
-#include "color.hpp"
+namespace totem {
 
 namespace graphics {
 
-/**
- * @brief Initializes GLFW and the sets other relavant graphics related data.
- */
-void init();
+    /**
+     * @brief A struct representing color.
+     */
+    struct Color {
+        float red;
+        float green;
+        float blue;
+        float alpha;
+    } typedef Color;
 
-/**
- * @brief A struct containing relevant information regarding windows.
- */
-struct Window {
-    // The actual (glfw) window
-    GLFWwindow *glfw_window;
-
-    // Meta data pertaining to the window
-    const char *title;
-    int width, height;
-    bool should_close;
-
-    // Default clear color
-    Color clear_color = Color{
+    /**
+     * @brief The default clear color of the windows.
+     */
+    const Color DEFAULT_CLEAR_COLOR = Color{
         // A nice pinkish color
         .red = 0.75f,
         .green = 0.0f,
         .blue = 0.25f,
         .alpha = 1.0f,
     };
-} typedef Window;
 
-/**
- * @brief A vector holding all the created windows.
- */
-static std::vector<Window> windows;
+    const Color RED = Color{
+        .red = 1.0f,
+        .green = 0.0f,
+        .blue = 0.0f,
+        .alpha = 1.0f,
+    };
 
-/**
- * @brief A struct holding only the current window (for the moment).
- */
-struct GraphicsState {
-    Window *current_window;
-} typedef GraphicsState;
+    const Color GREEN = Color{
+        .red = 0.0f,
+        .green = 1.0f,
+        .blue = 0.0f,
+        .alpha = 1.0f,
+    };
 
-static GraphicsState graphics_state;
+    const Color BLUE = Color{
+        .red = 0.0f,
+        .green = 0.0f,
+        .blue = 1.0f,
+        .alpha = 1.0f,
+    };
 
-/**
- * @brief The resize callback.
- *
- * @param window A `GLFWwindow` for which to set the callback.
- * @param width The new width of the window.
- * @param height The new height of the window.
- */
-void frame_buffer_size_callback(GLFWwindow *window, int width, int height);
+    const Color CYAN = Color{
+        .red = 0.0f,
+        .green = 1.0f,
+        .blue = 1.0f,
+        .alpha = 1.0f,
+    };
 
-/**
- * @brief Creates a window and returns either its index or an error code if a
- * GLFW window was not succesfully created.
- *
- * @param title The title of the window.
- * @param width The width of the window.
- * @param height The height of the window.
- *
- * @return The newly created window's index or an error code.
- */
-Window *create_window(const char *title, int width, int height);
+    const Color MAGENTA = Color{
+        .red = 1.0f,
+        .green = 0.0f,
+        .blue = 1.0f,
+        .alpha = 1.0f,
+    };
 
-/**
- * @brief Sets the window context to the given window.
- *
- * @param window The window to make the current context.
- */
-void set_current_window(Window *window);
+    const Color BLACK = Color{
+        .red = 0.0f,
+        .green = 0.0f,
+        .blue = 0.0f,
+        .alpha = 1.0f,
+    };
 
-/**
- * @brief Sets the clear color of the given window.
- *
- * @param window The window of which to set the clear color.
- * @param clear_color The clear color to set.
- */
-void set_clear_color(Window *window, Color clear_color);
+    const Color WHITE = Color{
+        .red = 1.0f,
+        .green = 1.0f,
+        .blue = 1.0f,
+        .alpha = 1.0f,
+    };
 
-/**
- * @brief Returns a pointer to the current window.
- *
- * @return A pointer to the current window.
- */
-Window *current_window();
+    /**
+     * @brief Handles window resizing appropriately.
+     */
+    void frame_buffer_size_callback( GLFWwindow* _, int width, int height );
 
-/**
- * @brief Destroys the window, freeing the GLFW context.
- *
- * @param window The window to destroy.
- */
-void destroy_window(Window window);
+    /**
+     * @brief A struct holding relevant window data.
+     */
+    struct Window {
+        GLFWwindow* glfw_window;
 
-/**
- * @brief Cleans up the graphics related resources.
- */
-void cleanup();
+        Color clear_color = DEFAULT_CLEAR_COLOR;
+    } typedef Window;
+
+    /**
+     * @brief Holds the instantiated windows of the application.
+     */
+    static std::vector<Window> WINDOWS;
+
+    /**
+     * @brief The index of the current context in the `WINDOWS` vector.
+     */
+    static int CURRENT_WND_IDX = 0;
+
+    /**
+     * @brief Initializes graphics related data.
+     */
+    void init();
+
+    /**
+     * @brief Cleans up graphics related resources.
+     */
+    void cleanup();
+
+    /**
+     * @brief Updates the graphics related state.
+     */
+    void update();
+
+    /**
+     * @brief Renders the graphics for the current context.
+     */
+    void render();
+
+    /**
+     * @brief Creates a new window.
+     */
+    void new_window( const char* title, int width, int height );
+
+    /**
+     * @brief Destroys the window of the current context.
+     */
+    void destroy_current_window();
+
+    /**
+     * @brief Returns the current context (meaning the `GLFWwindow` currently in
+     * focus).
+     *
+     * @return The current context (a `GLFWwindow`).
+     */
+    GLFWwindow* current_context();
+
+    /**
+     * @brief Sets the current context (meaning the `GLFWwindow` currently in
+     * focus).
+     */
+    void current_context( GLFWwindow* glfw_window );
+
+    /**
+     * @brief Sets the clear color of the current window.
+     *
+     * @param clear_color The new clear color.
+     */
+    void set_clear_color( Color clear_color );
+
+    /**
+     * @brief Clears the window.
+     */
+    void clear_window();
+
+    /**
+     * @brief Returns the window at the current window index in the `WINDOWS`
+     * vector.
+     */
+    Window* current_window();
 
 } // namespace graphics
+
+} // namespace totem
 
 #endif // GRAPHICS_H_
